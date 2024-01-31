@@ -1,0 +1,114 @@
+import pygame
+from pygame.locals import *
+from sys import exit
+import random
+#importações ^^^
+pygame.init()
+altura=600
+largura=580
+tela=pygame.display.set_mode((largura, altura))
+relogio=pygame.time.Clock()
+x=largura/2-20
+x_controle=20
+y=altura/2-20
+y_controle=0
+c=0 #variavel de controle
+c2=0 #variavel de controle
+raio=10
+x_maca=random.randint(50,largura-50)
+y_maca=random.randint(50,altura-50)
+fonte=pygame.font.SysFont('arial',20,True,True)
+pontos=0
+comprimeto_inicial=5
+morreu=False
+
+# Carrega a música de fundo
+pygame.mixer.music.set_volume(0.1)
+pygame.mixer.music.load('BoxCat Games - Trace Route.mp3')
+pygame.mixer.music.play(-1)  # O argumento -1 faz a música tocar em loop
+som_de_ponto=pygame.mixer.Sound('smw_1-up.circ')
+#função que faz a cobra crescer
+lista_corpo=[]
+def aumenta_cobra(lista_cobra):
+    for i in lista_cobra:
+        pygame.draw.rect(tela,(0,255,0), (i[0],i[1],25,25))
+
+game_over='GAME OVER'
+
+while True:#loop que dita o funcionamento do jogo
+    relogio.tick(20)
+    tela.fill((255,255,255))
+    texto=f'Pontos:{pontos}'
+    texto_format=fonte.render(texto, True, (0,0,0))
+    
+    for event in pygame.event.get():
+        if event.type==QUIT:
+            pygame.quit()
+            exit()
+        if event.type==KEYDOWN:
+            if event.key==K_DOWN:
+                if y_controle==0:
+                    x_controle=0
+                    y_controle=20
+            if event.key==K_UP:
+                if y_controle==0:
+                    x_controle=0
+                    y_controle=-20
+            if event.key==K_LEFT:
+                if x_controle==0:
+                    x_controle=-20
+                    y_controle=0
+            if event.key==K_RIGHT:
+                if x_controle==0:    
+                    x_controle=20
+                    y_controle=0
+    x=x+x_controle
+    y=y+y_controle
+                
+    
+    if y>=altura:
+        y=0
+    if x>=largura:
+        x=0
+    cobra=pygame.draw.rect(tela,(0,255,0), (x,y,25,25))
+    maca=pygame.draw.rect(tela,(255,0,0), (x_maca,y_maca,25,25))
+    if cobra.colliderect(maca):
+        x_maca=random.randint(0,largura)
+        y_maca=random.randint(0,altura)
+        pontos+=1
+        som_de_ponto.play()
+        comprimeto_inicial+=1
+        
+    lista_cabeca=[]
+    lista_cabeca.append(x)
+    lista_cabeca.append(y)
+    lista_corpo.append(lista_cabeca)
+    if len(lista_corpo)>comprimeto_inicial:
+        del(lista_corpo[0])
+    aumenta_cobra(lista_corpo)
+    if lista_corpo.count(lista_cabeca)>1:
+        morreu=True
+        while morreu:
+            for event in pygame.event.get():
+                if event.type==QUIT:
+                    pygame.quit()
+                    exit()
+                    
+
+
+
+
+
+    
+   
+
+    
+        
+    
+    
+   
+    
+    
+    
+    tela.blit(texto_format,(largura-100,10) )   
+    pygame.display.update()
